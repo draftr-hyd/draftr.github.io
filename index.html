@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<!-- Chosen Palette: Calm Neutral -->
+<!-- Application Structure Plan: The SPA is a single-page, vertical-scrolling narrative portfolio designed to guide the user logically from introduction to conversion (contact). It starts with a high-impact Hero section to establish brand identity. This is followed by a unified "About & Skills" section to build trust and outline expertise. The centerpiece is the "Work Showcase," providing visual proof of capabilities. The journey concludes with a clear "Contact" call-to-action. This linear flow is intuitive for a portfolio, making it highly usable. Navigation is supported by a sticky header with anchor links for quick access to each section. -->
+<!-- Visualization & Content Choices: Hero Section -> Goal: Engage -> Viz/Presentation: Large typography, CTA button -> Interaction: Smooth scroll anchor link, fade-in on load -> Justification: Creates immediate impact and clear user direction. -> Library/Method: HTML/CSS/JS. About & Skills Section -> Goal: Inform/Organize -> Viz/Presentation: Two-column text and skill cards -> Interaction: Fade-in on scroll -> Justification: Presents personal and technical info cleanly for easy scanning. -> Library/Method: HTML/Tailwind. Work Showcase -> Goal: Compare/Inform -> Viz/Presentation: Responsive grid of project cards -> Interaction: Hover effects on cards -> Justification: A grid is the most effective way to display a visual portfolio. -> Library/Method: HTML/Tailwind. Contact Section -> Goal: Engage -> Viz/Presentation: Text and Button -> Interaction: JS-powered copy-to-clipboard -> Justification: Provides a seamless, low-friction way for users to make contact. -> Library/Method: HTML/JS. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draftr Hyd | Digital Designer</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .section-container {
+            max-width: 1152px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 5rem 1.5rem;
+        }
+        .project-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .header-scrolled {
+            background-color: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="main-header" class="py-4 fixed top-0 w-full z-50 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-6 flex justify-between items-center">
+            <a href="#hero" class="flex items-center space-x-2">
+                <img src="assets/NewLogo - PNG.png" alt="Draftr Hyd Logo" class="h-10 w-auto object-contain" style="max-width:140px;">
+            </a>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="text-gray-600 hover:text-gray-900 transition-colors">About</a>
+                <a href="#work" class="text-gray-600 hover:text-gray-900 transition-colors">Work</a>
+                <a href="#contact" class="text-gray-600 hover:text-gray-900 transition-colors">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+                <section id="hero" class="min-h-screen flex items-center justify-center text-center px-4 bg-white">
+                        <div class="space-y-6 max-w-3xl">
+                                <h1 class="text-5xl md:text-7xl font-bold text-gray-900 leading-tight">
+                                        Designing with Purpose and Precision.
+                                </h1>
+                                <p class="text-lg md:text-xl text-gray-600">
+                                        Hi, I'm <span class="font-semibold text-gray-900">Om Sudhamsh</span> — representing <span class="font-semibold text-blue-700"><strong>Draftr Hyd</strong></span> (Design × Tech × Hyderabad).<br>
+                                        I craft clean, user-centric experiences that solve problems and delight users.
+                                        <i>Join WhatsApp Channel for updates about UI Resources, Tech Events across Hyderabad:</i>
+                                        <a href="https://whatsapp.com/channel/0029Vb7dohRLI8YdaiqwVa3A" target="_blank" class="inline-flex items-center text-blue-600 underline">
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="w-5 h-5 mr-1" style="display:inline-block;vertical-align:middle;">
+                                                Join Here
+                                        </a>
+                                </p>
+                                <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                                    <a href="#work" class="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
+                                            Explore My Work
+                                    </a>
+                                    <a href="https://omsudhamsh.github.io/" target="_blank" rel="noopener" class="inline-block px-8 py-3 bg-gray-900 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition-all duration-300 transform hover:scale-105">
+                                            View Professional Portfolio
+                                    </a>
+                                </div>
+                        </div>
+                </section>
+
+                <!-- Stats Section -->
+                <section class="section-container fade-in-section">
+                    <div class="max-w-3xl mx-auto py-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+                            <div>
+                                <div class="text-4xl font-extrabold text-blue-700">4+</div>
+                                <div class="mt-2 text-lg text-gray-700">Happy Clients</div>
+                            </div>
+                            <div>
+                                <div class="text-4xl font-extrabold text-blue-700">13+</div>
+                                <div class="mt-2 text-lg text-gray-700">Quality posters that increase engagement</div>
+                            </div>
+                            <div>
+                                <div class="text-4xl font-extrabold text-blue-700">3</div>
+                                <div class="mt-2 text-lg text-gray-700">Years of Experience</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+        <section id="about" class="section-container fade-in-section">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900">About & Skills</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+                  I’m Om Sudhamsh, the mind behind <span class="font-semibold text-blue-700">Draftr Hyd</span> — a portfolio at the intersection of design, technology, and Hyderabad’s creative spirit.<br>
+                  This section provides insight into my design philosophy and the technical skills I use to bring ideas to life. Here you can learn about my process, my passion for user-centered design, and the tools I leverage to create effective and beautiful digital products.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-5 gap-12 items-center">
+                <div class="md:col-span-3">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">My Design Philosophy</h3>
+                    <p class="text-gray-600 leading-relaxed space-y-4">
+                        <span>I believe that the best digital products are born from a deep empathy for the user. My process is centered around understanding their needs, behaviors, and motivations. I strive to create interfaces that are not only visually appealing but also intuitive, accessible, and efficient.</span>
+                        <span>For me, design is a blend of art and science—a systematic approach to problem-solving that results in elegant, functional, and impactful solutions. I focus on creating a clear visual hierarchy, maintaining consistency, and ensuring every element on the screen serves a distinct purpose.</span>
+                    </p>
+                </div>
+                 <div class="md:col-span-2 grid grid-cols-2 gap-6 text-center">
+                    <div class="bg-white p-6 rounded-lg shadow-sm"><span class="font-medium text-gray-700">Figma</span></div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm"><span class="font-medium text-gray-700">Canva</span></div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm"><span class="font-medium text-gray-700">Prototyping</span></div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm"><span class="font-medium text-gray-700">Wireframing</span></div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm"><span class="font-medium text-gray-700">User Research</span></div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm"><span class="font-medium text-gray-700">UI/UX Design</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!--
+        <section id="work" class="section-container bg-white fade-in-section">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900">Featured Work</h2>
+                 <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Here is a curated selection of my projects. Each card represents a unique design challenge and a solution that I am proud of. Click to explore the thinking, process, and results behind each piece of work. This is the tangible result of my skills and philosophy in action.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="project-card bg-white rounded-xl overflow-hidden shadow-md border border-gray-200">
+                    <img src="https://placehold.co/600x400/E2E8F0/4A5568?text=Project+One" alt="Project One" class="w-full h-auto object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Fintech App Redesign</h3>
+                        <p class="text-gray-500 mt-1">UX/UI, Prototyping</p>
+                    </div>
+                </div>
+                <div class="project-card bg-white rounded-xl overflow-hidden shadow-md border border-gray-200">
+                    <img src="https://placehold.co/600x400/E2E8F0/4A5568?text=Project+Two" alt="Project Two" class="w-full h-auto object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">SaaS Platform Branding</h3>
+                        <p class="text-gray-500 mt-1">Branding, Visual Identity</p>
+                    </div>
+                </div>
+                <div class="project-card bg-white rounded-xl overflow-hidden shadow-md border border-gray-200">
+                    <img src="https://placehold.co/600x400/E2E8F0/4A5568?text=Project+Three" alt="Project Three" class="w-full h-auto object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">E-commerce Experience</h3>
+                        <p class="text-gray-500 mt-1">Interaction Design, UI Kit</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        -->
+
+        <section id="contact" class="section-container fade-in-section">
+             <div class="text-center max-w-2xl mx-auto">
+                <h2 class="text-4xl font-bold text-gray-900">Let's Create Together</h2>
+                <p class="mt-4 text-lg text-gray-600">This is where our collaboration can begin. If you have a project in mind, a question about my work, or just want to connect, I'm always open to a conversation. Use the button below to easily copy my email address and reach out.</p>
+                <div class="mt-8 flex flex-col items-center">
+                    <div id="copy-container" class="flex items-center space-x-4 bg-white p-2 border border-gray-200 rounded-lg shadow-sm">
+                        <span id="email" class="text-gray-700 px-4">draftr.hyd@gmail.com</span>
+                        <button id="copy-button" class="px-6 py-2 bg-gray-800 text-white font-semibold rounded-md hover:bg-gray-900 transition-colors">Copy</button>
+                    </div>
+                    <span id="copy-success" class="mt-4 text-green-600 opacity-0 transition-opacity">Email copied to clipboard!</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-8 bg-white border-t border-gray-200">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 px-4">
+            <div class="text-gray-500 text-center md:text-left">
+                &copy; 2025 Draftr Hyd. All Rights Reserved.
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-2 md:gap-6 mt-4 md:mt-0">
+                <span class="font-semibold text-gray-700">Socials:</span>
+                <a href="https://www.linkedin.com/in/omsudhamsh" target="_blank" rel="noopener" class="text-blue-700 hover:underline">LinkedIn</a>
+                <a href="https://www.behance.net/omsudhamsh" target="_blank" rel="noopener" class="text-blue-700 hover:underline">Behance</a>
+                <a href="mailto:draftr.hyd@gmail.com" class="text-blue-700 hover:underline">Email</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyButton = document.getElementById('copy-button');
+            const emailSpan = document.getElementById('email');
+            const copySuccessSpan = document.getElementById('copy-success');
+            if (copyButton && emailSpan && copySuccessSpan) {
+                copyButton.addEventListener('click', () => {
+                    const emailText = emailSpan.innerText;
+                    navigator.clipboard.writeText(emailText).then(() => {
+                        copySuccessSpan.style.opacity = '1';
+                        setTimeout(() => {
+                            copySuccessSpan.style.opacity = '0';
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                });
+            }
+
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            const sectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            sections.forEach(section => {
+                sectionObserver.observe(section);
+            });
+
+            const header = document.getElementById('main-header');
+            const scrollObserver = new IntersectionObserver(([entry]) => {
+                if (!entry.isIntersecting) {
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                }
+            }, { rootMargin: "-200px 0px 0px 0px" });
+            scrollObserver.observe(document.getElementById('hero'));
+        });
+    </script>
+</body>
+</html>
+
