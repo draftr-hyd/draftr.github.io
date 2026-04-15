@@ -458,7 +458,7 @@
             }
 
             grid.innerHTML = filtered.map(item => `
-                <div class="card" onclick="openModal('${item.id}')" tabindex="0">
+                <a href="read.html?post=${item.slug}" class="card" tabindex="0" style="text-decoration:none; color:inherit; display:flex; flex-direction:column;">
                     ${item.cover ? `<img src="${item.cover}" alt="${item.title}" class="card-img" loading="lazy">` : `<div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:var(--font-mono);">No Cover</div>`}
                     <div class="card-content">
                         <div class="card-meta">
@@ -467,36 +467,21 @@
                         </div>
                         <h3 class="card-title">${item.title}</h3>
                         <p class="card-desc">${item.desc}</p>
+                        <div style="margin-top:auto; padding-top:1rem; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:0.85rem; color:var(--muted);">
+                            <span style="display:flex; align-items:center; gap:0.5rem; font-weight:500;">
+                                <img src="${item.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.author || 'Draftr Team')}`}" style="width:24px; height:24px; border-radius:50%; background:var(--border);">
+                                ${item.author || 'Draftr Team'}
+                            </span>
+                            <span style="color:var(--accent-nl); font-weight:600;">Read →</span>
+                        </div>
                     </div>
-                </div>
+                </a>
             `).join('');
         }
 
         // Modal Logic
         function openModal(id) {
-            const item = allItems.find(x => x.id === id);
-            if (!item) return;
-            currentModalItem = item;
-
-            document.getElementById('modalHeaderContent').innerHTML = `
-                <div style="font-family:var(--font-mono); font-size:0.875rem; color:var(--muted); margin-bottom:0.5rem;">
-                    <span class="badge" style="margin-right:0.5rem">${item.category}</span> #${item.edition || '00'} • ${fmtDate(item.date)}
-                </div>
-                <h2 style="font-size:1.75rem;">${item.title}</h2>
-            `;
-            
-            document.getElementById('modalBodyContent').innerHTML = `
-                ${item.cover ? `<img src="${item.cover}" style="width:100%; height:auto; border-radius:8px; margin-bottom:1.5rem;">` : ''}
-                <div style="white-space:pre-wrap;">${item.content || item.desc}</div>
-            `;
-
-            document.getElementById('modalActions').innerHTML = `
-                ${item.link ? `<a href="${item.link}" target="_blank" class="btn btn-primary">Read Full Issue →</a>` : ''}
-                <button class="btn btn-secondary" onclick="copyLink('${item.slug}')">Copy Link</button>
-            `;
-
-            modalOverlay.classList.add('open');
-            history.pushState({}, '', '#' + item.slug);
+            // Disabled: Now routes to read.html
         }
 
         function closeModal() {

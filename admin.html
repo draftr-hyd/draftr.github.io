@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
     <style>
         :root {
             --bg: #f8f9fa;
@@ -383,6 +384,16 @@
                         <label>Full Content (Modal)</label>
                         <textarea id="nl-content" rows="4"></textarea>
                     </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Author Name</label>
+                            <input type="text" id="nl-author" value="Draftr Team">
+                        </div>
+                        <div class="form-group">
+                            <label>Author Avatar URL (Optional)</label>
+                            <input type="url" id="nl-avatar">
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label>External Read Link (Optional)</label>
                         <input type="url" id="nl-link">
@@ -564,6 +575,7 @@
     <div id="toast"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
     <script>
         const SUPABASE_URL = 'https://agcomjdwcfrutpsyiffa.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnY29tamR3Y2ZydXRwc3lpZmZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTc2NDcsImV4cCI6MjA5MTc5MzY0N30.sZGXwZKzDyfvwJmu5n0l6hBVTejYFYdRyNKaiqaiqpY';
@@ -689,6 +701,9 @@
             document.getElementById(`form-${type}`).reset();
             document.getElementById(`${type}-id`).value = '';
             document.getElementById(`${type}-slug-preview`).textContent = 'slug: ';
+            if(type === 'nl' && nlEditor) {
+                nlEditor.value('');
+            }
         }
 
         async function saveItem(e, type) {
@@ -709,7 +724,7 @@
 
             // Map fields based on type
             const fields = {
-                nl: ['title', 'edition', 'date', 'category', 'cover', 'desc', 'content', 'link'],
+                nl: ['title', 'edition', 'date', 'category', 'cover', 'desc', 'content', 'link', 'author', 'avatar'],
                 ev: ['title', 'type', 'status', 'date', 'time', 'venue', 'mode', 'speakers', 'desc', 'reg', 'cover'],
                 rs: ['title', 'type', 'date', 'tag', 'desc', 'url', 'cover']
             };
@@ -718,6 +733,10 @@
                 const el = document.getElementById(`${type}-${f}`);
                 if(el) item[f] = el.value || null;
             });
+            
+            if(type === 'nl' && nlEditor) {
+                item.content = nlEditor.value() || null;
+            }
             
             try {
                 if(existing) {
@@ -754,6 +773,9 @@
                 const el = document.getElementById(`${type}-${k}`);
                 if(el) el.value = item[k];
             });
+            if(type === 'nl' && nlEditor) {
+                nlEditor.value(item.content || '');
+            }
             window.scrollTo(0,0);
         }
 
@@ -851,7 +873,16 @@
         }
 
         // Init
-        checkAuth();
+        let nlEditor;
+        checkAuth().then(() => {
+            if(document.getElementById('nl-content')) {
+                nlEditor = new EasyMDE({
+                    element: document.getElementById('nl-content'),
+                    spellChecker: false,
+                    maxHeight: '400px'
+                });
+            }
+        });
     </script>
 </body>
 </html>

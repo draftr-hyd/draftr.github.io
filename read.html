@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read | Draftr Hyd</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #242424;
+            --muted: #6b6b6b;
+            --border: #f2f2f2;
+            --accent: #1d4ed8;
+            --font-head: 'Georgia', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #121212;
+                --text: #e0e0e0;
+                --muted: #a0a0a0;
+                --border: #2d2d2d;
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Nav */
+        nav {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--text); }
+
+        /* Article Layout */
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        .category-badge {
+            color: var(--accent);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .article-title {
+            font-family: var(--font-head);
+            font-size: 2.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--border);
+        }
+
+        .author-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .post-details {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .cover-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 3rem;
+            display: block;
+            object-fit: cover;
+            max-height: 400px;
+        }
+
+        /* Markdown Content Styling */
+        .content {
+            font-family: var(--font-head);
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--text);
+            padding-bottom: 4rem;
+        }
+
+        .content p { margin-bottom: 1.5rem; }
+        .content h1, .content h2, .content h3 {
+            font-family: var(--font-body);
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        .content h2 { font-size: 1.75rem; }
+        .content h3 { font-size: 1.4rem; }
+        
+        .content img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .content a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .content a:hover { border-bottom-color: var(--accent); }
+
+        .content blockquote {
+            border-left: 4px solid var(--text);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--muted);
+        }
+
+        .content ul, .content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        .content li { margin-bottom: 0.5rem; }
+
+        .content pre {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .content pre { background: #1e1e1e; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 0;
+            color: var(--muted);
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+
+        .error {
+            text-align: center;
+            padding: 4rem 0;
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-brand">
+            Draftr Hyd
+        </a>
+        <a href="newsletters.html" class="back-link">← Back to Newsletters</a>
+    </nav>
+
+    <main id="articleContainer">
+        <div class="loading">Loading story...</div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://agcomjdwcfrutpsyiffa.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnY29tamR3Y2ZydXRwc3lpZmZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTc2NDcsImV4cCI6MjA5MTc5MzY0N30.sZGXwZKzDyfvwJmu5n0l6hBVTejYFYdRyNKaiqaiqpY';
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function fmtDate(d) {
+            if (!d) return '';
+            return new Date(d).toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric'
+            });
+        }
+
+        // Calculate estimated reading time
+        function getReadTime(text) {
+            const wordsPerMinute = 200;
+            const words = text.trim().split(/\s+/).length;
+            const time = Math.ceil(words / wordsPerMinute);
+            return time > 0 ? time : 1;
+        }
+
+        async function loadArticle() {
+            const container = document.getElementById('articleContainer');
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('post');
+
+            if (!slug) {
+                container.innerHTML = '<div class="error">No article specified.</div>';
+                return;
+            }
+
+            try {
+                const { data, error } = await _supabase
+                    .from('newsletters')
+                    .select('*')
+                    .eq('slug', slug)
+                    .single();
+
+                if (error || !data) {
+                    throw new Error("Article not found.");
+                }
+
+                // If article has external link, maybe redirect? For now we just render.
+                const authorName = data.author || 'Draftr Team';
+                const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`;
+                const avatar = data.avatar || defaultAvatar;
+
+                const htmlContent = marked.parse(data.content || '*No content provided.*');
+                const readTime = getReadTime(data.content || '');
+
+                document.title = `${data.title} | Draftr Hyd`;
+
+                container.innerHTML = `
+                    <span class="category-badge">${data.category || 'Newsletter'}</span>
+                    <h1 class="article-title">${data.title}</h1>
+                    
+                    <div class="article-meta">
+                        <img src="${avatar}" alt="${authorName}" class="author-avatar" onerror="this.src='${defaultAvatar}'">
+                        <div class="author-info">
+                            <span class="author-name">${authorName}</span>
+                            <span class="post-details">${fmtDate(data.date)} · ${readTime} min read</span>
+                        </div>
+                    </div>
+
+                    ${data.cover ? `<img src="${data.cover}" alt="Cover" class="cover-image">` : ''}
+
+                    <div class="content">
+                        ${htmlContent}
+                    </div>
+                `;
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div class="error">Failed to load article. It may have been removed.</div>`;
+            }
+        }
+
+        loadArticle();
+    </script>
+</body>
+</html>
