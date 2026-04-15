@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Draftr Hyd</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --surface2: #f1f5f9;
+            --border: #e2e8f0;
+            --accent-nl: #1d4ed8;
+            --accent-ev: #1d4ed8;
+            --accent-rs: #1d4ed8;
+            --accent-admin: #1d4ed8;
+            --text: #111827;
+            --muted: #4b5563;
+            --danger: #ef4444;
+            --font-head: 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-head); }
+
+        /* Login view */
+        #loginView {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .login-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-box h1 { margin-bottom: 2rem; color: var(--accent-admin); }
+        .login-box input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            font-family: var(--font-body);
+        }
+        .login-box button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent-admin);
+            color: #fff;
+            font-weight: 600;
+            font-family: var(--font-body);
+            cursor: pointer;
+        }
+
+        /* Admin view */
+        #adminView {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        @media (min-width: 768px) {
+            #adminView { flex-direction: row; }
+        }
+
+        .sidebar {
+            width: 100%;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 250px;
+                border-bottom: none;
+            }
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--accent-admin);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar-nav { flex-direction: column; flex: 1; overflow-x: visible; }
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            color: var(--muted);
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+            transition: color 0.2s, background 0.2s;
+            white-space: nowrap;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover { background: var(--surface2); color: var(--text); }
+        .nav-item.active {
+            color: var(--accent-admin);
+            background: rgba(124, 92, 252, 0.05);
+            border-left-color: var(--accent-admin);
+        }
+
+        .logout-btn {
+            margin: auto 1rem 1rem 1rem;
+            padding: 0.5rem;
+            text-align: center;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            border-radius: 6px;
+            cursor: pointer;
+            display: none;
+        }
+        @media (min-width: 768px) { .logout-btn { display: block; } }
+        .logout-btn:hover { border-color: var(--text); color: var(--text); }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .tab-section { display: none; }
+        .tab-section.active { display: block; }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Forms */
+        .form-group { margin-bottom: 1rem; }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            font-family: var(--font-body);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-admin);
+        }
+
+        .slug-preview {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent-admin);
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+        }
+        .btn-primary { background: var(--accent-admin); color: #fff; }
+        .btn-danger { background: rgba(252, 92, 125, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+        /* Tables/Lists */
+        .data-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .data-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .data-item-main { flex: 1; }
+        .data-item-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .data-item-meta { font-size: 0.75rem; color: var(--muted); font-family: var(--font-mono); }
+        .data-item-actions { display: flex; gap: 0.5rem; }
+        .data-item-actions button {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .data-item-actions button:hover { color: var(--text); border-color: var(--muted); }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-val { font-size: 2.5rem; font-family: var(--font-head); color: var(--accent-admin); font-weight: 700; margin-bottom: 0.5rem; }
+        .stat-label { color: var(--muted); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 2rem; right: 2rem;
+            background: var(--surface2); color: var(--text);
+            padding: 1rem 1.5rem; border-radius: 8px;
+            border-left: 4px solid var(--accent-admin);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transform: translateY(150%); transition: transform 0.3s;
+            z-index: 2000;
+        }
+        #toast.show { transform: translateY(0); }
+        
+        .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 640px) { .two-cols { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <!-- Login View -->
+    <div id="loginView">
+        <div class="login-box">
+            <h1>Draftr Admin</h1>
+            <input type="text" id="loginUser" placeholder="Username" autocomplete="on">
+            <input type="password" id="loginPass" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <p id="loginErr" style="color:var(--danger); margin-top:1rem; font-size:0.875rem; display:none;">Invalid credentials</p>
+        </div>
+    </div>
+
+    <!-- Admin View -->
+    <div id="adminView">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                Draftr Panel
+                <span class="mobile-logout" style="font-size:0.75rem; cursor:pointer;" onclick="logout()">[Exit]</span>
+            </div>
+            <div class="sidebar-nav">
+                <a class="nav-item active" onclick="switchTab('dashboard')">📊 Dashboard</a>
+                <a class="nav-item" onclick="switchTab('newsletters')">📨 Newsletters</a>
+                <a class="nav-item" onclick="switchTab('events')">🎯 Events</a>
+                <a class="nav-item" onclick="switchTab('resources')">📚 Resources</a>
+                <a class="nav-item" onclick="switchTab('settings')">⚙️ Settings</a>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="main-content">
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-section active">
+                <div class="header-row"><h2>Dashboard</h2></div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-nl">0</div>
+                        <div class="stat-label">Newsletters</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-ev">0</div>
+                        <div class="stat-label">Events</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-rs">0</div>
+                        <div class="stat-label">Resources</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletters Tab -->
+            <div id="tab-newsletters" class="tab-section">
+                <div class="header-row">
+                    <h2>Manage Newsletters</h2>
+                    <button class="btn btn-secondary" onclick="resetForm('nl')">+ New</button>
+                </div>
+                
+                <form id="form-nl" onsubmit="saveItem(event, 'nl')">
+                    <input type="hidden" id="nl-id">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="nl-title" required oninput="updateSlug('nl')">
+                        <div class="slug-preview" id="nl-slug-preview">slug: </div>
+                    </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Edition (#)</label>
+                            <input type="text" id="nl-edition" placeholder="001">
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="nl-date" required>
+                        </div>
+                    </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="nl-category" required>
+                                <option value="UI/UX">UI/UX</option>
+                                <option value="Tech">Tech</option>
+                                <option value="Design">Design</option>
+                                <option value="Career">Career</option>
+                                <option value="General">General</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cover Image URL (Optional)</label>
+                            <input type="url" id="nl-cover">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Short Description (Card)</label>
+                        <textarea id="nl-desc" rows="2" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Content (Modal)</label>
+                        <textarea id="nl-content" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>External Read Link (Optional)</label>
+                        <input type="url" id="nl-link">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Newsletter</button>
+                </form>
+                
+                <div class="data-list" id="list-nl"></div>
+            </div>
+
+            <!-- Events Tab -->
+            <div id="tab-events" class="tab-section">
+                <div class="header-row">
+                    <h2>Manage Events</h2>
+                    <button class="btn btn-secondary" onclick="resetForm('ev')">+ New</button>
+                </div>
+
+                <form id="form-ev" onsubmit="saveItem(event, 'ev')">
+                    <input type="hidden" id="ev-id">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="ev-title" required oninput="updateSlug('ev')">
+                        <div class="slug-preview" id="ev-slug-preview">slug: </div>
+                    </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="ev-type" required>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Meetup">Meetup</option>
+                                <option value="Webinar">Webinar</option>
+                                <option value="Hackathon">Hackathon</option>
+                                <option value="Talk">Talk</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="ev-status" required>
+                                <option value="Upcoming">Upcoming</option>
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="ev-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time (e.g. 10:00 AM)</label>
+                            <input type="text" id="ev-time">
+                        </div>
+                    </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Venue (or Link)</label>
+                            <input type="text" id="ev-venue" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mode</label>
+                            <select id="ev-mode" required>
+                                <option value="In-Person">In-Person</option>
+                                <option value="Online">Online</option>
+                                <option value="Hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Speakers (Comma separated)</label>
+                        <input type="text" id="ev-speakers">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="ev-desc" rows="3" required></textarea>
+                    </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Registration Link</label>
+                            <input type="url" id="ev-reg">
+                        </div>
+                        <div class="form-group">
+                            <label>Cover Image URL (Optional)</label>
+                            <input type="url" id="ev-cover">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Event</button>
+                </form>
+
+                <div class="data-list" id="list-ev"></div>
+            </div>
+
+            <!-- Resources Tab -->
+            <div id="tab-resources" class="tab-section">
+                <div class="header-row">
+                    <h2>Manage Resources</h2>
+                    <button class="btn btn-secondary" onclick="resetForm('rs')">+ New</button>
+                </div>
+
+                <form id="form-rs" onsubmit="saveItem(event, 'rs')">
+                    <input type="hidden" id="rs-id">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="rs-title" required oninput="updateSlug('rs')">
+                        <div class="slug-preview" id="rs-slug-preview">slug: </div>
+                    </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="rs-type" required>
+                                <option value="Template">Template</option>
+                                <option value="Tool">Tool</option>
+                                <option value="Article">Article</option>
+                                <option value="Video">Video</option>
+                                <option value="Book">Book</option>
+                                <option value="Checklist">Checklist</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date Added</label>
+                            <input type="date" id="rs-date" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tags (Comma separated)</label>
+                        <input type="text" id="rs-tag" placeholder="Figma, Free, UI">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="rs-desc" rows="2" required></textarea>
+                    </div>
+                    <div class="two-cols">
+                        <div class="form-group">
+                            <label>Resource URL (External)</label>
+                            <input type="url" id="rs-url" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cover Image URL (Optional)</label>
+                            <input type="url" id="rs-cover">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Resource</button>
+                </form>
+
+                <div class="data-list" id="list-rs"></div>
+            </div>
+
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="tab-section">
+                <div class="header-row"><h2>Settings</h2></div>
+                
+                <div style="background:var(--surface); padding:2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:2rem;">
+                    <h3 style="margin-bottom:1rem;">Data Management</h3>
+                    <p style="color:var(--muted); margin-bottom:1.5rem;">Export your full database as JSON for backup. Import to restore.</p>
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="exportData()">Export Data (.json)</button>
+                        <label class="btn btn-secondary" style="margin-bottom:0; cursor:pointer;">
+                            Import Data
+                            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <div style="background:var(--surface); padding:2rem; border-radius:8px; border:1px solid var(--danger); margin-bottom:2rem;">
+                    <h3 style="margin-bottom:1rem; color:var(--danger)">Danger Zone</h3>
+                    <p style="color:var(--muted); margin-bottom:1.5rem;">This will clear ALL draftr local data.</p>
+                    <button class="btn btn-danger" onclick="clearData()">Clear All Data</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        // Data & Utils
+        const KEYS = {
+            nl: 'draftr_newsletters',
+            ev: 'draftr_events',
+            rs: 'draftr_resources'
+        };
+
+        if(!localStorage.getItem('draftr_admin_creds')){
+            localStorage.setItem('draftr_admin_creds', JSON.stringify({u:'admin', p:'draftr2025'}));
+        }
+
+        function getData(type) {
+            try { return JSON.parse(localStorage.getItem(KEYS[type])) || []; } catch { return []; }
+        }
+        function setData(type, data) {
+            localStorage.setItem(KEYS[type], JSON.stringify(data));
+        }
+
+        function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+        function toSlug(str) {
+            return str.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+        }
+
+        function showToast(msg, isErr=false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.borderLeftColor = isErr ? 'var(--danger)' : 'var(--accent-admin)';
+            t.classList.add('show');
+            setTimeout(()=>t.classList.remove('show'), 2800);
+        }
+
+        // Auth
+        let isLoggedIn = false;
+        function checkAuth() {
+            if(sessionStorage.getItem('draftr_admin_session')) {
+                showAdmin();
+            }
+        }
+        
+        function login() {
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            const creds = JSON.parse(localStorage.getItem('draftr_admin_creds'));
+            
+            if(u === creds.u && p === creds.p) {
+                sessionStorage.setItem('draftr_admin_session', 'true');
+                showAdmin();
+            } else {
+                document.getElementById('loginErr').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('draftr_admin_session');
+            window.location.reload();
+        }
+
+        function showAdmin() {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('adminView').style.display = 'flex';
+            updateDashboard();
+            renderList('nl'); renderList('ev'); renderList('rs');
+        }
+
+        // UI Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function updateDashboard() {
+            document.getElementById('stat-nl').textContent = getData('nl').length;
+            document.getElementById('stat-ev').textContent = getData('ev').length;
+            document.getElementById('stat-rs').textContent = getData('rs').length;
+        }
+
+        // Forms & CRUD
+        function updateSlug(type) {
+            const title = document.getElementById(`${type}-title`).value;
+            document.getElementById(`${type}-slug-preview`).textContent = 'slug: ' + toSlug(title);
+        }
+
+        function resetForm(type) {
+            document.getElementById(`form-${type}`).reset();
+            document.getElementById(`${type}-id`).value = '';
+            document.getElementById(`${type}-slug-preview`).textContent = 'slug: ';
+        }
+
+        function saveItem(e, type) {
+            e.preventDefault();
+            const data = getData(type);
+            const id = document.getElementById(`${type}-id`).value || uid();
+            
+            let item = { id, createdAt: Date.now() };
+            const existing = data.find(x => x.id === id);
+            if(existing) item = { ...existing };
+            else item.slug = toSlug(document.getElementById(`${type}-title`).value); // ONLY apply base slug on creation
+            
+            // Check slug uniqueness
+            let tempSlug = toSlug(document.getElementById(`${type}-title`).value);
+            if(!existing || tempSlug !== item.slug) {
+                const conflict = data.some(x => x.slug === tempSlug && x.id !== id);
+                if(conflict) tempSlug += '-' + Date.now().toString().slice(-4);
+                item.slug = tempSlug;
+            }
+
+            // Map fields based on type
+            const fields = {
+                nl: ['title', 'edition', 'date', 'category', 'cover', 'desc', 'content', 'link'],
+                ev: ['title', 'type', 'status', 'date', 'time', 'venue', 'mode', 'speakers', 'desc', 'reg', 'cover'],
+                rs: ['title', 'type', 'date', 'tag', 'desc', 'url', 'cover']
+            };
+
+            fields[type].forEach(f => {
+                const el = document.getElementById(`${type}-${f}`);
+                if(el) item[f] = el.value;
+            });
+
+            if(existing) {
+                const idx = data.findIndex(x => x.id === id);
+                data[idx] = item;
+                showToast('Item updated successfully');
+            } else {
+                data.push(item);
+                showToast('Item created successfully');
+            }
+
+            setData(type, data);
+            resetForm(type);
+            renderList(type);
+            updateDashboard();
+        }
+
+        function editItem(type, id) {
+            const item = getData(type).find(x => x.id === id);
+            if(!item) return;
+            
+            document.getElementById(`${type}-id`).value = item.id;
+            document.getElementById(`${type}-slug-preview`).textContent = 'slug: ' + item.slug;
+            
+            Object.keys(item).forEach(k => {
+                const el = document.getElementById(`${type}-${k}`);
+                if(el) el.value = item[k];
+            });
+            window.scrollTo(0,0);
+        }
+
+        function deleteItem(type, id) {
+            if(!confirm('Are you sure you want to delete this?')) return;
+            let data = getData(type);
+            data = data.filter(x => x.id !== id);
+            setData(type, data);
+            renderList(type);
+            updateDashboard();
+            showToast('Item deleted.');
+        }
+
+        function renderList(type) {
+            const data = getData(type).sort((a,b) => b.createdAt - a.createdAt);
+            const container = document.getElementById(`list-${type}`);
+            
+            container.innerHTML = data.map(item => `
+                <div class="data-item">
+                    <div class="data-item-main">
+                        <div class="data-item-title">${item.title}</div>
+                        <div class="data-item-meta">${item.slug}</div>
+                    </div>
+                    <div class="data-item-actions">
+                        <button onclick="editItem('${type}', '${item.id}')">Edit</button>
+                        <button onclick="deleteItem('${type}', '${item.id}')" style="color:var(--danger)">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Settings actions
+        function exportData() {
+            const db = {
+                newsletters: getData('nl'),
+                events: getData('ev'),
+                resources: getData('rs')
+            };
+            const blob = new Blob([JSON.stringify(db, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `draftr-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function importData(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const db = JSON.parse(evt.target.result);
+                    if(db.newsletters) setData('nl', db.newsletters);
+                    if(db.events) setData('ev', db.events);
+                    if(db.resources) setData('rs', db.resources);
+                    renderList('nl'); renderList('ev'); renderList('rs'); updateDashboard();
+                    showToast('Data imported successfully');
+                } catch(err) {
+                    showToast('Invalid JSON file', true);
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        function clearData() {
+            if(confirm('WARNING: Irreversible! Delete all data?')) {
+                localStorage.removeItem(KEYS.nl);
+                localStorage.removeItem(KEYS.ev);
+                localStorage.removeItem(KEYS.rs);
+                renderList('nl'); renderList('ev'); renderList('rs'); updateDashboard();
+                showToast('All data cleared.');
+            }
+        }
+
+        // Init
+        checkAuth();
+    </script>
+</body>
+</html>

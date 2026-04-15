@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events | Draftr Hyd</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --surface2: #f1f5f9;
+            --border: #e2e8f0;
+            --accent-nl: #1d4ed8;
+            --accent-ev: #1d4ed8;
+            --accent-rs: #1d4ed8;
+            --accent-admin: #1d4ed8;
+            --text: #111827;
+            --muted: #4b5563;
+            --font-head: 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-head); }
+
+        /* Sticky Nav */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .nav-links { display: flex; gap: 2rem; }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a:focus, .nav-links a.active {
+            color: var(--text);
+        }
+
+        @media (max-width: 640px) {
+            nav { flex-direction: column; padding: 1rem; gap: 1rem; }
+            .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        }
+
+        /* Layout */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .hero { text-align: center; margin-bottom: 4rem; }
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .hero p {
+            color: var(--muted);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-family: var(--font-body);
+            cursor: pointer;
+            min-width: 200px;
+        }
+        .filter-select:focus { outline: none; border-color: var(--accent-ev); }
+
+        .section-title {
+            margin: 3rem 0 1.5rem;
+            font-size: 1.75rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Grid & Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover, .card:focus-within {
+            transform: translateY(-4px);
+            border-color: var(--accent-ev);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 160px;
+            background: var(--surface2);
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+
+        .badge, .chip {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .badge {
+            background: rgba(252, 92, 125, 0.1);
+            color: var(--accent-ev);
+        }
+
+        .chip {
+            background: var(--surface2);
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        
+        .chip.upcoming { border-color: var(--accent-ev); color: var(--text); }
+        .chip.ongoing { border-color: var(--accent-rs); color: var(--text); }
+
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-details {
+            color: var(--muted);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted);
+            grid-column: 1 / -1;
+            background: var(--surface);
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.25s;
+        }
+        .modal-overlay.open .modal { transform: translateY(0); }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: var(--text); }
+
+        .modal-body { padding: 1.5rem; }
+
+        .speaker-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .speaker-chip {
+            background: var(--surface2);
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .modal-actions {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            background: var(--surface2);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s, color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary { background: var(--accent-ev); color: #fff; }
+        .btn-primary:hover { background: #e04a68; }
+        .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--muted); }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 2rem; right: 2rem;
+            background: var(--surface2);
+            color: var(--text);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-ev);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000;
+        }
+        #toast.show { transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-brand">Draftr Hyd</a>
+        <div class="nav-links">
+            <a href="newsletters.html">Newsletters</a>
+            <a href="events.html" class="active">Events</a>
+            <a href="resources.html">Resources</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="hero">
+            <h1>Community Events</h1>
+            <p>Join us at our upcoming meetups and workshops. Open to all makers in Hyderabad.</p>
+        </div>
+
+        <div class="controls">
+            <select id="typeFilter" class="filter-select">
+                <option value="All">All Types</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Meetup">Meetup</option>
+                <option value="Webinar">Webinar</option>
+                <option value="Hackathon">Hackathon</option>
+                <option value="Talk">Talk</option>
+            </select>
+            <select id="statusFilter" class="filter-select">
+                <option value="All">All Statuses</option>
+                <option value="Upcoming">Upcoming</option>
+                <option value="Ongoing">Ongoing</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
+
+        <h2 class="section-title">Upcoming & Ongoing</h2>
+        <div id="activeGrid" class="grid"></div>
+
+        <h2 class="section-title" style="margin-top:4rem;">Past Events</h2>
+        <div id="pastGrid" class="grid"></div>
+    </main>
+
+    <!-- Modal -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div id="modalHeaderContent"></div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBodyContent"></div>
+            <div class="modal-actions" id="modalActions"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script>
+        // Utilities
+        function getData(key) {
+            try { return JSON.parse(localStorage.getItem(key)) || []; }
+            catch { return []; }
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.borderLeftColor = isError ? 'var(--accent-nl)' : 'var(--accent-ev)';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        function fmtDate(d) {
+            if (!d) return '';
+            return new Date(d + 'T00:00:00').toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+        }
+
+        // State
+        const allItems = getData('draftr_events');
+        let currentModalItem = null;
+
+        // Elements
+        const activeGrid = document.getElementById('activeGrid');
+        const pastGrid = document.getElementById('pastGrid');
+        const typeFilter = document.getElementById('typeFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const modalOverlay = document.getElementById('modalOverlay');
+
+        // Render
+        function render() {
+            const fType = typeFilter.value;
+            const fStatus = statusFilter.value;
+
+            const filtered = allItems.filter(item => {
+                const matchType = fType === 'All' || item.type === fType;
+                const matchStatus = fStatus === 'All' || item.status === fStatus;
+                return matchType && matchStatus;
+            });
+            
+            // Sort by date (newest first roughly for past, closest for upcoming)
+            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            const activeEvents = filtered.filter(i => i.status === 'Upcoming' || i.status === 'Ongoing');
+            const pastEvents = filtered.filter(i => i.status === 'Completed' || i.status === 'Cancelled');
+
+            const renderCard = (item) => `
+                <div class="card" onclick="openModal('${item.id}')" tabindex="0">
+                    ${item.cover ? `<img src="${item.cover}" alt="${item.title}" class="card-img" loading="lazy">` : `<div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:var(--font-mono);">No Cover</div>`}
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="badge">${item.type}</span>
+                            <span class="chip ${item.status.toLowerCase()}">${item.status}</span>
+                        </div>
+                        <h3 class="card-title">${item.title}</h3>
+                        <div class="card-details">
+                            <span>📅 ${fmtDate(item.date)} ${item.time ? '• ' + item.time : ''}</span>
+                            <span>📍 ${item.venue} (${item.mode})</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            activeGrid.innerHTML = activeEvents.length ? activeEvents.map(renderCard).join('') : '<div class="empty-state">No active events found.</div>';
+            pastGrid.innerHTML = pastEvents.length ? pastEvents.map(renderCard).join('') : '<div class="empty-state">No past events found.</div>';
+        }
+
+        // Modal Logic
+        function openModal(id) {
+            const item = allItems.find(x => x.id === id);
+            if (!item) return;
+            currentModalItem = item;
+
+            const isPast = item.status === 'Completed' || item.status === 'Cancelled';
+            const speakersHtml = item.speakers ? item.speakers.split(',').map(s => `<span class="speaker-chip">🎙️ ${s.trim()}</span>`).join('') : '';
+
+            document.getElementById('modalHeaderContent').innerHTML = `
+                <div style="font-family:var(--font-mono); font-size:0.875rem; color:var(--muted); margin-bottom:0.5rem; display:flex; gap:0.5rem; align-items:center;">
+                    <span class="badge">${item.type}</span>
+                    <span class="chip ${item.status.toLowerCase()}">${item.status}</span>
+                </div>
+                <h2 style="font-size:1.75rem;">${item.title}</h2>
+                <div style="font-family:var(--font-mono); font-size:0.875rem; color:var(--muted); margin-top:0.5rem;">
+                    📅 ${fmtDate(item.date)} ${item.time ? '• ' + item.time : ''} <br/>
+                    📍 ${item.venue} (${item.mode})
+                </div>
+            `;
+            
+            document.getElementById('modalBodyContent').innerHTML = `
+                ${item.cover ? `<img src="${item.cover}" style="width:100%; height:auto; border-radius:8px; margin-bottom:1.5rem;">` : ''}
+                ${speakersHtml ? `<div class="speaker-chips">${speakersHtml}</div>` : ''}
+                <div style="white-space:pre-wrap;">${item.desc}</div>
+            `;
+
+            document.getElementById('modalActions').innerHTML = `
+                ${(!isPast && item.reg) ? `<a href="${item.reg}" target="_blank" class="btn btn-primary">Register Now →</a>` : ''}
+                <button class="btn btn-secondary" onclick="copyLink('${item.slug}')">Share Event</button>
+            `;
+
+            modalOverlay.classList.add('open');
+            history.pushState({}, '', '#' + item.slug);
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('open');
+            currentModalItem = null;
+            history.pushState({}, '', location.pathname);
+        }
+
+        function copyLink(slug) {
+            const url = window.location.origin + window.location.pathname + '#' + slug;
+            navigator.clipboard.writeText(url).then(() => { showToast('Link copied to clipboard!'); });
+        }
+
+        // Event Listeners
+        typeFilter.addEventListener('change', render);
+        statusFilter.addEventListener('change', render);
+        
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+
+        // Hash Routing Pattern
+        function handleHash() {
+            const hash = location.hash.slice(1);
+            if (hash) {
+                const item = allItems.find(x => x.slug === hash);
+                if (item) openModal(item.id);
+            } else { closeModal(); }
+        }
+
+        window.addEventListener('hashchange', handleHash);
+
+        // Init
+        render();
+        handleHash();
+    </script>
+</body>
+</html>

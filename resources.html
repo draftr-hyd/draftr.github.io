@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources | Draftr Hyd</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --surface2: #f1f5f9;
+            --border: #e2e8f0;
+            --accent-nl: #1d4ed8;
+            --accent-ev: #1d4ed8;
+            --accent-rs: #1d4ed8;
+            --accent-admin: #1d4ed8;
+            --text: #111827;
+            --muted: #4b5563;
+            --font-head: 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-head); }
+
+        /* Sticky Nav */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .nav-links { display: flex; gap: 2rem; }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a:focus, .nav-links a.active { color: var(--text); }
+
+        @media (max-width: 640px) {
+            nav { flex-direction: column; padding: 1rem; gap: 1rem; }
+            .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        }
+
+        /* Layout */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .hero { text-align: center; margin-bottom: 4rem; }
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .hero p {
+            color: var(--muted);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-family: var(--font-body);
+        }
+
+        .search-bar:focus { outline: none; border-color: var(--accent-rs); }
+
+        .filter-select {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-family: var(--font-body);
+            cursor: pointer;
+        }
+
+        /* Grid & Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .card:hover, .card:focus-within {
+            transform: translateY(-4px);
+            border-color: var(--accent-rs);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 160px;
+            background: var(--surface2);
+            object-fit: cover;
+        }
+
+        .free-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--accent-rs);
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: var(--muted);
+        }
+
+        .badge {
+            background: rgba(92, 244, 160, 0.1);
+            color: var(--accent-rs);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .card-title { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .card-desc {
+            color: var(--muted);
+            font-size: 0.9375rem;
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+        
+        .card-tags {
+            font-family: var(--font-mono);
+            color: var(--muted);
+            font-size: 0.75rem;
+            margin-top: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted);
+            grid-column: 1 / -1;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.25s;
+        }
+        .modal-overlay.open .modal { transform: translateY(0); }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: var(--text); }
+
+        .modal-body { padding: 1.5rem; }
+
+        .modal-actions {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            background: var(--surface2);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s, color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary { background: var(--accent-rs); color: #000; }
+        .btn-primary:hover { background: #4ce390; }
+        .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--muted); }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 2rem; right: 2rem;
+            background: var(--surface2);
+            color: var(--text);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-rs);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000;
+        }
+        #toast.show { transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-brand">Draftr Hyd</a>
+        <div class="nav-links">
+            <a href="newsletters.html">Newsletters</a>
+            <a href="events.html">Events</a>
+            <a href="resources.html" class="active">Resources</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="hero">
+            <h1>Free Resources</h1>
+            <p>100% free templates, tools, and guides for designers and developers in the community.</p>
+        </div>
+
+        <div class="controls">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search resources...">
+            <select id="filterSelect" class="filter-select">
+                <option value="All">All Types</option>
+                <option value="Template">Template</option>
+                <option value="Tool">Tool</option>
+                <option value="Article">Article</option>
+                <option value="Video">Video</option>
+                <option value="Book">Book</option>
+                <option value="Checklist">Checklist</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div id="grid" class="grid"></div>
+    </main>
+
+    <!-- Modal -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div id="modalHeaderContent"></div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBodyContent"></div>
+            <div class="modal-actions" id="modalActions"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script>
+        // Utilities
+        const typeEmojis = {
+            Template: "🎨", Tool: "🛠️", Article: "📄", Video: "🎥", Book: "📚", Checklist: "✅", Other: "💡"
+        };
+        
+        function getData(key) {
+            try { return JSON.parse(localStorage.getItem(key)) || []; }
+            catch { return []; }
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.borderLeftColor = isError ? 'var(--accent-ev)' : 'var(--accent-rs)';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        function fmtDate(d) {
+            if (!d) return '';
+            return new Date(d + 'T00:00:00').toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+        }
+
+        // State
+        const allItems = getData('draftr_resources');
+        let currentModalItem = null;
+
+        // Elements
+        const grid = document.getElementById('grid');
+        const searchInput = document.getElementById('searchInput');
+        const filterSelect = document.getElementById('filterSelect');
+        const modalOverlay = document.getElementById('modalOverlay');
+
+        // Render
+        function render() {
+            const query = searchInput.value.toLowerCase();
+            const filter = filterSelect.value;
+
+            const filtered = allItems.filter(item => {
+                const matchSearch = item.title.toLowerCase().includes(query) || 
+                                    item.desc.toLowerCase().includes(query) || 
+                                    (item.tag && item.tag.toLowerCase().includes(query));
+                const matchFilter = filter === 'All' || item.type === filter;
+                return matchSearch && matchFilter;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state">No resources found.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const emoji = typeEmojis[item.type] || "💡";
+                const tagsList = item.tag ? item.tag.split(',').map(t => `#${t.trim()}`).join(' ') : '';
+                return `
+                <div class="card" onclick="openModal('${item.id}')" tabindex="0">
+                    <div class="free-badge">100% Free</div>
+                    ${item.cover ? `<img src="${item.cover}" alt="${item.title}" class="card-img" loading="lazy">` : `<div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:var(--font-mono);">No Cover</div>`}
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="badge">${emoji} ${item.type}</span>
+                            <span>${fmtDate(item.date)}</span>
+                        </div>
+                        <h3 class="card-title">${item.title}</h3>
+                        <p class="card-desc">${item.desc}</p>
+                        ${tagsList ? `<div class="card-tags">${tagsList}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Modal Logic
+        function openModal(id) {
+            const item = allItems.find(x => x.id === id);
+            if (!item) return;
+            currentModalItem = item;
+
+            const emoji = typeEmojis[item.type] || "💡";
+            const tagsList = item.tag ? item.tag.split(',').map(t => `<span style="margin-right:0.5rem;color:var(--muted);font-family:var(--font-mono);">#${t.trim()}</span>`).join('') : '';
+
+            document.getElementById('modalHeaderContent').innerHTML = `
+                <div style="font-family:var(--font-mono); font-size:0.875rem; color:var(--muted); margin-bottom:0.5rem; display:flex; gap:0.5rem; align-items:center;">
+                    <span class="badge" style="display:inline-block">${emoji} ${item.type}</span>
+                    <span style="background:var(--accent-rs); color:#000; font-weight:bold; font-size:0.75rem; padding:0.25rem 0.5rem; border-radius:10px;">100% Free</span>
+                </div>
+                <h2 style="font-size:1.75rem;">${item.title}</h2>
+                <div style="margin-top:0.5rem;">${tagsList}</div>
+            `;
+            
+            document.getElementById('modalBodyContent').innerHTML = `
+                ${item.cover ? `<img src="${item.cover}" style="width:100%; height:auto; border-radius:8px; margin-bottom:1.5rem;">` : ''}
+                <div style="white-space:pre-wrap;">${item.desc}</div>
+            `;
+
+            document.getElementById('modalActions').innerHTML = `
+                ${item.url ? `<a href="${item.url}" target="_blank" class="btn btn-primary">Access Resource →</a>` : ''}
+                <button class="btn btn-secondary" onclick="copyLink('${item.slug}')">Share Link</button>
+            `;
+
+            modalOverlay.classList.add('open');
+            history.pushState({}, '', '#' + item.slug);
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('open');
+            currentModalItem = null;
+            history.pushState({}, '', location.pathname);
+        }
+
+        function copyLink(slug) {
+            const url = window.location.origin + window.location.pathname + '#' + slug;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Link copied to clipboard!');
+            });
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', render);
+        filterSelect.addEventListener('change', render);
+        
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+
+        // Hash Routing Pattern
+        function handleHash() {
+            const hash = location.hash.slice(1);
+            if (hash) {
+                const item = allItems.find(x => x.slug === hash);
+                if (item) openModal(item.id);
+            } else { closeModal(); }
+        }
+
+        window.addEventListener('hashchange', handleHash);
+
+        // Init
+        render();
+        handleHash();
+    </script>
+</body>
+</html>
