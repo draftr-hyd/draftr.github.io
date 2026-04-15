@@ -154,14 +154,17 @@
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: var(--accent-rs);
-            color: #000;
+            background: #10b981; /* universally readable green */
+            color: #ffffff;
+            border: 1px solid #059669;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-family: var(--font-mono);
             font-weight: 700;
             font-size: 0.75rem;
             z-index: 10;
+            letter-spacing: 0.5px;
         }
 
         .card-content {
@@ -453,7 +456,7 @@
             document.getElementById('modalHeaderContent').innerHTML = `
                 <div style="font-family:var(--font-mono); font-size:0.875rem; color:var(--muted); margin-bottom:0.5rem; display:flex; gap:0.5rem; align-items:center;">
                     <span class="badge" style="display:inline-block">${emoji} ${item.type}</span>
-                    <span style="background:var(--accent-rs); color:#000; font-weight:bold; font-size:0.75rem; padding:0.25rem 0.5rem; border-radius:10px;">100% Free</span>
+                    <span style="background:#10b981; color:#ffffff; font-weight:700; font-size:0.75rem; padding:0.25rem 0.75rem; border-radius:20px; font-family:var(--font-mono); border:1px solid #059669; letter-spacing:0.5px;">100% Free</span>
                 </div>
                 <h2 style="font-size:1.75rem;">${item.title}</h2>
                 <div style="margin-top:0.5rem;">${tagsList}</div>
