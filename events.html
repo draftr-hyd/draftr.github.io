@@ -380,7 +380,7 @@
     <script>
         const SUPABASE_URL = 'https://agcomjdwcfrutpsyiffa.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnY29tamR3Y2ZydXRwc3lpZmZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTc2NDcsImV4cCI6MjA5MTc5MzY0N30.sZGXwZKzDyfvwJmu5n0l6hBVTejYFYdRyNKaiqaiqpY';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Utilities
         function showToast(msg, isError = false) {
@@ -411,15 +411,16 @@
 
         async function init() {
             try {
-                const { data, error } = await supabase.from('events').select('*').order('created_at', { ascending: false });
+                const { data, error } = await _supabase.from('events').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 allItems = data || [];
+                console.log("Fetched events:", allItems);
                 render();
                 handleHash();
             } catch (err) {
-                console.error(err);
-                activeGrid.innerHTML = `<div class="empty-state">Failed to load events.</div>`;
-                pastGrid.innerHTML = `<div class="empty-state">Failed to load events.</div>`;
+                console.error("Init Error:", err);
+                activeGrid.innerHTML = `<div class="empty-state">Failed to load events. Check console.</div>`;
+                pastGrid.innerHTML = `<div class="empty-state">Failed to load events. Check console.</div>`;
             }
         }
 
@@ -437,7 +438,11 @@
             });
             
             // Sort by date (newest first roughly for past, closest for upcoming)
-            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+            filtered.sort((a, b) => {
+                const dateA = a.date ? new Date(a.date).getTime() : 0;
+                const dateB = b.date ? new Date(b.date).getTime() : 0;
+                return dateB - dateA;
+            });
 
             const activeEvents = filtered.filter(i => {
                 const s = i.status || 'Upcoming';

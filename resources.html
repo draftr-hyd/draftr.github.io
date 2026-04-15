@@ -357,7 +357,7 @@
     <script>
         const SUPABASE_URL = 'https://agcomjdwcfrutpsyiffa.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnY29tamR3Y2ZydXRwc3lpZmZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTc2NDcsImV4cCI6MjA5MTc5MzY0N30.sZGXwZKzDyfvwJmu5n0l6hBVTejYFYdRyNKaiqaiqpY';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Utilities
         const typeEmojis = {
@@ -391,7 +391,7 @@
 
         async function init() {
             try {
-                const { data, error } = await supabase.from('resources').select('*').order('created_at', { ascending: false });
+                const { data, error } = await _supabase.from('resources').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 allItems = data || [];
                 render();
