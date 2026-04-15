@@ -429,33 +429,44 @@
             const fStatus = statusFilter.value;
 
             const filtered = allItems.filter(item => {
-                const matchType = fType === 'All' || item.type === fType;
-                const matchStatus = fStatus === 'All' || item.status === fStatus;
+                const itemType = item.type || 'Event';
+                const itemStatus = item.status || 'Upcoming';
+                const matchType = fType === 'All' || itemType === fType;
+                const matchStatus = fStatus === 'All' || itemStatus === fStatus;
                 return matchType && matchStatus;
             });
             
             // Sort by date (newest first roughly for past, closest for upcoming)
             filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-            const activeEvents = filtered.filter(i => i.status === 'Upcoming' || i.status === 'Ongoing');
-            const pastEvents = filtered.filter(i => i.status === 'Completed' || i.status === 'Cancelled');
+            const activeEvents = filtered.filter(i => {
+                const s = i.status || 'Upcoming';
+                return s === 'Upcoming' || s === 'Ongoing';
+            });
+            const pastEvents = filtered.filter(i => {
+                const s = i.status || 'Upcoming';
+                return s === 'Completed' || s === 'Cancelled';
+            });
 
-            const renderCard = (item) => `
+            const renderCard = (item) => {
+                const status = item.status || 'Upcoming';
+                const type = item.type || 'Event';
+                return `
                 <div class="card" onclick="openModal('${item.id}')" tabindex="0">
                     ${item.cover ? `<img src="${item.cover}" alt="${item.title}" class="card-img" loading="lazy">` : `<div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:var(--font-mono);">No Cover</div>`}
                     <div class="card-content">
                         <div class="card-meta">
-                            <span class="badge">${item.type}</span>
-                            <span class="chip ${item.status.toLowerCase()}">${item.status}</span>
+                            <span class="badge">${type}</span>
+                            <span class="chip ${status.toLowerCase()}">${status}</span>
                         </div>
-                        <h3 class="card-title">${item.title}</h3>
+                        <h3 class="card-title">${item.title || 'Untitled'}</h3>
                         <div class="card-details">
                             <span>📅 ${fmtDate(item.date)} ${item.time ? '• ' + item.time : ''}</span>
-                            <span>📍 ${item.venue} (${item.mode})</span>
+                            <span>📍 ${item.venue || 'TBA'} (${item.mode || 'TBA'})</span>
                         </div>
                     </div>
                 </div>
-            `;
+            `};
 
             activeGrid.innerHTML = activeEvents.length ? activeEvents.map(renderCard).join('') : '<div class="empty-state">No active events found.</div>';
             pastGrid.innerHTML = pastEvents.length ? pastEvents.map(renderCard).join('') : '<div class="empty-state">No past events found.</div>';
@@ -467,18 +478,20 @@
             if (!item) return;
             currentModalItem = item;
 
-            const isPast = item.status === 'Completed' || item.status === 'Cancelled';
+            const status = item.status || 'Upcoming';
+            const type = item.type || 'Event';
+            const isPast = status === 'Completed' || status === 'Cancelled';
             const speakersHtml = item.speakers ? item.speakers.split(',').map(s => `<span class="speaker-chip">🎙️ ${s.trim()}</span>`).join('') : '';
 
             document.getElementById('modalHeaderContent').innerHTML = `
                 <div style="font-family:var(--font-mono); font-size:0.875rem; color:var(--muted); margin-bottom:0.5rem; display:flex; gap:0.5rem; align-items:center;">
-                    <span class="badge">${item.type}</span>
-                    <span class="chip ${item.status.toLowerCase()}">${item.status}</span>
+                    <span class="badge">${type}</span>
+                    <span class="chip ${status.toLowerCase()}">${status}</span>
                 </div>
-                <h2 style="font-size:1.75rem;">${item.title}</h2>
+                <h2 style="font-size:1.75rem;">${item.title || 'Untitled'}</h2>
                 <div style="font-family:var(--font-mono); font-size:0.875rem; color:var(--muted); margin-top:0.5rem;">
                     📅 ${fmtDate(item.date)} ${item.time ? '• ' + item.time : ''} <br/>
-                    📍 ${item.venue} (${item.mode})
+                    📍 ${item.venue || 'TBA'} (${item.mode || 'TBA'})
                 </div>
             `;
             
