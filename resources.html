@@ -290,6 +290,80 @@
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
         .btn-secondary:hover { border-color: var(--muted); }
 
+        /* Quick Links / Linktree */
+        .quick-links-section {
+            max-width: 600px;
+            margin: 0 auto 5rem auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .quick-link-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: var(--accent-rs);
+        }
+
+        .quick-link-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 1.25rem;
+            background: var(--surface2);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .quick-link-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .quick-link-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .quick-link-desc {
+            color: var(--muted);
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .section-heading-center {
+            text-align: center;
+            font-family: var(--font-head);
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+
         /* Toast */
         #toast {
             position: fixed;
@@ -305,6 +379,34 @@
             z-index: 2000;
         }
         #toast.show { transform: translateY(0); }
+
+        /* Resource Tabs */
+        .resource-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem auto;
+            border-bottom: 1px solid var(--border);
+            max-width: 600px;
+        }
+        .res-tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            margin-bottom: -1px;
+            font-family: 'Inter', sans-serif;
+        }
+        .res-tab-btn:hover { color: var(--text); }
+        .res-tab-btn.active {
+            color: var(--accent-rs);
+            border-bottom-color: var(--accent-rs);
+        }
     </style>
 </head>
 <body>
@@ -324,21 +426,34 @@
             <p>100% free templates, tools, and guides for designers and developers in the community.</p>
         </div>
 
-        <div class="controls">
-            <input type="text" id="searchInput" class="search-bar" placeholder="Search resources...">
-            <select id="filterSelect" class="filter-select">
-                <option value="All">All Types</option>
-                <option value="Template">Template</option>
-                <option value="Tool">Tool</option>
-                <option value="Article">Article</option>
-                <option value="Video">Video</option>
-                <option value="Book">Book</option>
-                <option value="Checklist">Checklist</option>
-                <option value="Other">Other</option>
-            </select>
+        <div class="resource-tabs">
+            <button class="res-tab-btn active" id="tabLibraryBtn" onclick="switchResourceTab('library')">Library Area</button>
+            <button class="res-tab-btn" id="tabQuickBtn" onclick="switchResourceTab('quicklinks')">Quick Links</button>
         </div>
 
-        <div id="grid" class="grid"></div>
+        <div id="contentLibrary">
+            <div class="controls" style="margin-bottom: 2rem;">
+                <input type="text" id="searchInput" class="search-bar" placeholder="Search resources...">
+                <select id="filterSelect" class="filter-select">
+                    <option value="All">All Types</option>
+                    <option value="Template">Template</option>
+                    <option value="Tool">Tool</option>
+                    <option value="Article">Article</option>
+                    <option value="Video">Video</option>
+                    <option value="Book">Book</option>
+                    <option value="Checklist">Checklist</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div id="grid" class="grid"></div>
+        </div>
+
+        <div id="contentQuicklinks" style="display:none;">
+            <div id="quickLinksGrid" class="quick-links-section"></div>
+            <div style="text-align:center; margin-top:2rem;">
+                <button class="btn btn-secondary" onclick="copyShareQuickLinks()">Share Quick Links Tab ↗</button>
+            </div>
+        </div>
     </main>
 
     <!-- Modal -->
@@ -409,21 +524,60 @@
         function render() {
             const query = searchInput.value.toLowerCase();
             const filter = filterSelect.value;
+            
+            const quickLinksGrid = document.getElementById('quickLinksGrid');
+
+            if(quickLinksGrid) quickLinksGrid.innerHTML = '';
 
             const filtered = allItems.filter(item => {
-                const matchSearch = item.title.toLowerCase().includes(query) || 
-                                    item.desc.toLowerCase().includes(query) || 
-                                    (item.tag && item.tag.toLowerCase().includes(query));
+                const searchStr = query.toLowerCase();
+                const titleMatch = item.title ? item.title.toLowerCase().includes(searchStr) : false;
+                const descMatch = item.desc ? item.desc.toLowerCase().includes(searchStr) : false;
+                const tagMatch = item.tag ? item.tag.toLowerCase().includes(searchStr) : false;
+                
+                const matchSearch = titleMatch || descMatch || tagMatch;
                 const matchFilter = filter === 'All' || item.type === filter;
                 return matchSearch && matchFilter;
             });
 
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="empty-state">No resources found.</div>`;
+            // separate bio links from regular resources
+            const bioLinks = allItems.filter(item => item.type === 'Bio Link' || item.type === 'Bio Link (Linktree)');
+            const regularResources = filtered.filter(item => item.type !== 'Bio Link' && item.type !== 'Bio Link (Linktree)');
+
+            // Render Bio Links
+            if (quickLinksGrid) {
+                if (bioLinks.length > 0) {
+                    quickLinksGrid.innerHTML = bioLinks.map(item => `
+                        <a href="${item.url || item.link || '#'}" onclick="trackClick(event, '${item.id}', '${item.url || item.link || '#'}')" target="_blank" class="quick-link-btn" title="${item.desc || ''}">
+                            <div class="quick-link-content">
+                                <strong>${item.title}</strong>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="quick-link-icon"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                        </a>
+                    `).join('');
+                } else {
+                    // Show a placeholder so the admin knows where it will appear
+                    quickLinksGrid.innerHTML = `
+                        <div class="empty-state" style="padding: 1.5rem; text-align: center; border: 1px dashed var(--border); border-radius: 12px; color: var(--muted);">
+                            No Quick Links added yet. Add a resource with type "Bio Link" from the admin panel.
+                        </div>
+                    `;
+                }
+            }
+
+            if (regularResources.length === 0) {
+                if (bioLinks.length === 0) {
+                    grid.innerHTML = `<div class="empty-state">No resources found.</div>`;
+                    grid.style.display = 'grid'; // reset display in case it was hidden
+                } else {
+                    grid.innerHTML = '';
+                    grid.style.display = 'none';
+                }
                 return;
             }
 
-            grid.innerHTML = filtered.map(item => {
+            grid.style.display = 'grid'; // Show grid
+            grid.innerHTML = regularResources.map(item => {
                 const emoji = typeEmojis[item.type] || "💡";
                 const tagsList = item.tag ? item.tag.split(',').map(t => `#${t.trim()}`).join(' ') : '';
                 return `
@@ -445,6 +599,16 @@
         }
 
         // Modal Logic
+        async function trackClick(e, id, url) {
+            e.preventDefault();
+            // Fire and forget tracking
+            _supabase.rpc('increment_click', { p_id: id }).then(({error}) => {
+                if(error) console.log('Tracking error:', error.message);
+            });
+            // Immediately open the URL
+            window.open(url, '_blank');
+        }
+
         function openModal(id) {
             const item = allItems.find(x => x.id === id);
             if (!item) return;
@@ -496,13 +660,43 @@
         modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
 
+        // Tab routing logic
+        function switchResourceTab(tabId) {
+            document.querySelectorAll('.res-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('contentLibrary').style.display = 'none';
+            document.getElementById('contentQuicklinks').style.display = 'none';
+
+            if (tabId === 'quicklinks') {
+                document.getElementById('tabQuickBtn').classList.add('active');
+                document.getElementById('contentQuicklinks').style.display = 'block';
+                history.pushState(null, null, '#quicklinks');
+            } else {
+                document.getElementById('tabLibraryBtn').classList.add('active');
+                document.getElementById('contentLibrary').style.display = 'block';
+                history.pushState(null, null, location.pathname);
+            }
+        }
+
+        function copyShareQuickLinks() {
+            const url = window.location.origin + window.location.pathname + '#quicklinks';
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Quick Links Tab URL copied!');
+            });
+        }
+
         // Hash Routing Pattern
         function handleHash() {
             const hash = location.hash.slice(1);
-            if (hash) {
+            if (hash === 'quicklinks') {
+                switchResourceTab('quicklinks');
+            } else if (hash) {
+                switchResourceTab('library');
                 const item = allItems.find(x => x.slug === hash);
                 if (item) openModal(item.id);
-            } else { closeModal(); }
+            } else { 
+                switchResourceTab('library');
+                closeModal(); 
+            }
         }
 
         window.addEventListener('hashchange', handleHash);

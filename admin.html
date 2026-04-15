@@ -311,6 +311,7 @@
                 <a class="nav-item" onclick="switchTab('newsletters')">📨 Newsletters</a>
                 <a class="nav-item" onclick="switchTab('events')">🎯 Events</a>
                 <a class="nav-item" onclick="switchTab('resources')">📚 Resources</a>
+                <a class="nav-item" onclick="switchTab('quicklinks')">🔗 Quick Links</a>
                 <a class="nav-item" onclick="switchTab('settings')">⚙️ Settings</a>
             </div>
             <button class="logout-btn" onclick="logout()">Logout</button>
@@ -506,6 +507,7 @@
                         <div class="form-group">
                             <label>Type</label>
                             <select id="rs-type" required>
+                                <option value="Bio Link">Bio Link (Linktree)</option>
                                 <option value="Template">Template</option>
                                 <option value="Tool">Tool</option>
                                 <option value="Article">Article</option>
@@ -544,6 +546,17 @@
                 <div class="data-list" id="list-rs"></div>
             </div>
 
+            <!-- Quick Links Tab -->
+            <div id="tab-quicklinks" class="tab-section">
+                <div class="header-row">
+                    <h2>Quick Links (Linktree)</h2>
+                </div>
+                
+                <div style="background:var(--surface); padding:2rem; border-radius:8px; border:1px solid var(--border); margin-bottom:2rem;">
+                    <p style="color:var(--muted); margin-bottom:1.5rem;">Below are all your resources marked as 'Bio Link (Linktree)'. Click statistics are tracked whenever a user clicks them on the Resources page.</p>
+                    <div class="data-list" id="list-ql"></div>
+                </div>
+            </div>
 
             <!-- Settings Tab -->
             <div id="tab-settings" class="tab-section">
@@ -797,6 +810,7 @@
         function renderList(type) {
             const data = getData(type).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
             const container = document.getElementById(`list-${type}`);
+            if(!container) return;
             
             container.innerHTML = data.map(item => `
                 <div class="data-item">
@@ -810,6 +824,26 @@
                     </div>
                 </div>
             `).join('');
+
+            // Also render Quick Links specifically
+            if (type === 'rs') {
+                const qlContainer = document.getElementById('list-ql');
+                if(qlContainer) {
+                    const qlData = data.filter(item => item.type === 'Bio Link (Linktree)' || item.type === 'Bio Link');
+                    qlContainer.innerHTML = qlData.map(item => `
+                        <div class="data-item" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div class="data-item-main">
+                                <div class="data-item-title">${item.title}</div>
+                                <div class="data-item-meta">${item.url}</div>
+                            </div>
+                            <div style="font-weight:bold; color:var(--accent-rs); display:flex; align-items:center; gap:0.5rem; background:rgba(0,0,0,0.05); padding:0.5rem 1rem; border-radius:30px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                                ${item.clicks || 0} clicks
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
         }
 
         // Settings actions
