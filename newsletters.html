@@ -394,13 +394,13 @@
     <!-- Toast -->
     <div id="toast"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Utilities
-        function getData(key) {
-            try { return JSON.parse(localStorage.getItem(key)) || []; }
-            catch { return []; }
-        }
+        const SUPABASE_URL = 'https://agcomjdwcfrutpsyiffa.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnY29tamR3Y2ZydXRwc3lpZmZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTc2NDcsImV4cCI6MjA5MTc5MzY0N30.sZGXwZKzDyfvwJmu5n0l6hBVTejYFYdRyNKaiqaiqpY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // Utilities
         function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -411,13 +411,13 @@
 
         function fmtDate(d) {
             if (!d) return '';
-            return new Date(d + 'T00:00:00').toLocaleDateString('en-IN', {
+            return new Date(d).toLocaleDateString('en-IN', {
                 day: 'numeric', month: 'short', year: 'numeric'
             });
         }
 
         // State
-        const allItems = getData('draftr_newsletters');
+        let allItems = [];
         let currentModalItem = null;
 
         // Elements
@@ -425,6 +425,19 @@
         const searchInput = document.getElementById('searchInput');
         const filterSelect = document.getElementById('filterSelect');
         const modalOverlay = document.getElementById('modalOverlay');
+
+        async function init() {
+            try {
+                const { data, error } = await supabase.from('newsletters').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+                allItems = data || [];
+                render();
+                handleHash();
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = `<div class="empty-state">Failed to load newsletters.</div>`;
+            }
+        }
 
         // Render
         function render() {
@@ -527,8 +540,7 @@
         window.addEventListener('hashchange', handleHash);
 
         // Init
-        render();
-        handleHash();
+        init();
     </script>
 </body>
 </html>

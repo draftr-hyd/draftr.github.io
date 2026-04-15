@@ -291,7 +291,7 @@
     <div id="loginView">
         <div class="login-box">
             <h1>Draftr Admin</h1>
-            <input type="text" id="loginUser" placeholder="Username" autocomplete="on">
+            <input type="email" id="loginUser" placeholder="Admin Email" autocomplete="on">
             <input type="password" id="loginPass" placeholder="Password">
             <button onclick="login()">Login</button>
             <p id="loginErr" style="color:var(--danger); margin-top:1rem; font-size:0.875rem; display:none;">Invalid credentials</p>
@@ -560,25 +560,48 @@
         </div>
     </div>
 
+    <!-- Toast -->
     <div id="toast"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        const SUPABASE_URL = 'https://agcomjdwcfrutpsyiffa.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnY29tamR3Y2ZydXRwc3lpZmZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTc2NDcsImV4cCI6MjA5MTc5MzY0N30.sZGXwZKzDyfvwJmu5n0l6hBVTejYFYdRyNKaiqaiqpY';
+        const supabaseUrl = SUPABASE_URL;
+        const supabaseKey = SUPABASE_KEY;
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
         // Data & Utils
         const KEYS = {
-            nl: 'draftr_newsletters',
-            ev: 'draftr_events',
-            rs: 'draftr_resources'
+            nl: 'newsletters',
+            ev: 'events',
+            rs: 'resources'
         };
 
-        if(!localStorage.getItem('draftr_admin_creds')){
-            localStorage.setItem('draftr_admin_creds', JSON.stringify({u:'admin', p:'draftr2025'}));
+        let inMemData = {
+            nl: [],
+            ev: [],
+            rs: []
+        };
+
+        async function fetchAllData() {
+            try {
+                const [nlReq, evReq, rsReq] = await Promise.all([
+                    _supabase.from('newsletters').select('*').order('created_at', { ascending: false }),
+                    _supabase.from('events').select('*').order('created_at', { ascending: false }),
+                    _supabase.from('resources').select('*').order('created_at', { ascending: false })
+                ]);
+                inMemData.nl = nlReq.data || [];
+                inMemData.ev = evReq.data || [];
+                inMemData.rs = rsReq.data || [];
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to fetch data from Supabase", true);
+            }
         }
 
         function getData(type) {
-            try { return JSON.parse(localStorage.getItem(KEYS[type])) || []; } catch { return []; }
-        }
-        function setData(type, data) {
-            localStorage.setItem(KEYS[type], JSON.stringify(data));
+            return inMemData[type] || [];
         }
 
         function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
@@ -596,34 +619,48 @@
         }
 
         // Auth
-        let isLoggedIn = false;
-        function checkAuth() {
-            if(sessionStorage.getItem('draftr_admin_session')) {
+        async function checkAuth() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
                 showAdmin();
             }
         }
         
-        function login() {
-            const u = document.getElementById('loginUser').value;
-            const p = document.getElementById('loginPass').value;
-            const creds = JSON.parse(localStorage.getItem('draftr_admin_creds'));
+        async function login() {
+            const email = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+            const btn = document.querySelector('.login-box button');
+            const errEl = document.getElementById('loginErr');
             
-            if(u === creds.u && p === creds.p) {
-                sessionStorage.setItem('draftr_admin_session', 'true');
-                showAdmin();
+            btn.textContent = 'Logging in...';
+            btn.disabled = true;
+            
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            btn.textContent = 'Login';
+            btn.disabled = false;
+            
+            if (error) {
+                errEl.textContent = error.message;
+                errEl.style.display = 'block';
             } else {
-                document.getElementById('loginErr').style.display = 'block';
+                errEl.style.display = 'none';
+                showAdmin();
             }
         }
 
-        function logout() {
-            sessionStorage.removeItem('draftr_admin_session');
+        async function logout() {
+            await _supabase.auth.signOut();
             window.location.reload();
         }
 
-        function showAdmin() {
+        async function showAdmin() {
             document.getElementById('loginView').style.display = 'none';
             document.getElementById('adminView').style.display = 'flex';
+            await fetchAllData();
             updateDashboard();
             renderList('nl'); renderList('ev'); renderList('rs');
         }
@@ -654,20 +691,18 @@
             document.getElementById(`${type}-slug-preview`).textContent = 'slug: ';
         }
 
-        function saveItem(e, type) {
+        async function saveItem(e, type) {
             e.preventDefault();
-            const data = getData(type);
-            const id = document.getElementById(`${type}-id`).value || uid();
+            const id = document.getElementById(`${type}-id`).value;
+            let existing = id ? inMemData[type].find(x => x.id === id) : null;
             
-            let item = { id, createdAt: Date.now() };
-            const existing = data.find(x => x.id === id);
-            if(existing) item = { ...existing };
-            else item.slug = toSlug(document.getElementById(`${type}-title`).value); // ONLY apply base slug on creation
+            let item = existing ? { ...existing } : { slug: toSlug(document.getElementById(`${type}-title`).value) };
             
             // Check slug uniqueness
-            let tempSlug = toSlug(document.getElementById(`${type}-title`).value);
-            if(!existing || tempSlug !== item.slug) {
-                const conflict = data.some(x => x.slug === tempSlug && x.id !== id);
+            let tempSlug = existing ? document.getElementById(`${type}-title`).value === existing.title ? existing.slug : toSlug(document.getElementById(`${type}-title`).value) : toSlug(document.getElementById(`${type}-title`).value);
+            
+            if(!existing || tempSlug !== existing.slug) {
+                const conflict = inMemData[type].some(x => x.slug === tempSlug && x.id !== id);
                 if(conflict) tempSlug += '-' + Date.now().toString().slice(-4);
                 item.slug = tempSlug;
             }
@@ -681,19 +716,28 @@
 
             fields[type].forEach(f => {
                 const el = document.getElementById(`${type}-${f}`);
-                if(el) item[f] = el.value;
+                if(el) item[f] = el.value || null;
             });
-
-            if(existing) {
-                const idx = data.findIndex(x => x.id === id);
-                data[idx] = item;
-                showToast('Item updated successfully');
-            } else {
-                data.push(item);
-                showToast('Item created successfully');
+            
+            try {
+                if(existing) {
+                    const { error } = await _supabase.from(KEYS[type]).update(item).eq('id', id);
+                    if (error) throw error;
+                    showToast('Item updated successfully');
+                } else {
+                    const { error, data } = await _supabase.from(KEYS[type]).insert(item).select();
+                    if (error) throw error;
+                    item.id = data[0].id;
+                    item.created_at = data[0].created_at;
+                    showToast('Item created successfully');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to save to Supabase", true);
+                return;
             }
 
-            setData(type, data);
+            await fetchAllData();
             resetForm(type);
             renderList(type);
             updateDashboard();
@@ -713,18 +757,23 @@
             window.scrollTo(0,0);
         }
 
-        function deleteItem(type, id) {
+        async function deleteItem(type, id) {
             if(!confirm('Are you sure you want to delete this?')) return;
-            let data = getData(type);
-            data = data.filter(x => x.id !== id);
-            setData(type, data);
-            renderList(type);
-            updateDashboard();
-            showToast('Item deleted.');
+            try {
+                const { error } = await _supabase.from(KEYS[type]).delete().eq('id', id);
+                if (error) throw error;
+                await fetchAllData();
+                renderList(type);
+                updateDashboard();
+                showToast('Item deleted.');
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to delete from Supabase", true);
+            }
         }
 
         function renderList(type) {
-            const data = getData(type).sort((a,b) => b.createdAt - a.createdAt);
+            const data = getData(type).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
             const container = document.getElementById(`list-${type}`);
             
             container.innerHTML = data.map(item => `
@@ -760,27 +809,42 @@
             const file = e.target.files[0];
             if(!file) return;
             const reader = new FileReader();
-            reader.onload = function(evt) {
+            reader.onload = async function(evt) {
                 try {
                     const db = JSON.parse(evt.target.result);
-                    if(db.newsletters) setData('nl', db.newsletters);
-                    if(db.events) setData('ev', db.events);
-                    if(db.resources) setData('rs', db.resources);
+                    if(db.newsletters && db.newsletters.length > 0) {
+                        db.newsletters.forEach(item => delete item.id);
+                        await _supabase.from('newsletters').insert(db.newsletters);
+                    }
+                    if(db.events && db.events.length > 0) {
+                        db.events.forEach(item => delete item.id);
+                        await _supabase.from('events').insert(db.events);
+                    }
+                    if(db.resources && db.resources.length > 0) {
+                        db.resources.forEach(item => delete item.id);
+                        await _supabase.from('resources').insert(db.resources);
+                    }
+                    await fetchAllData();
                     renderList('nl'); renderList('ev'); renderList('rs'); updateDashboard();
                     showToast('Data imported successfully');
                 } catch(err) {
-                    showToast('Invalid JSON file', true);
+                    console.error(err);
+                    showToast('Import failed', true);
                 }
             };
             reader.readAsText(file);
             e.target.value = '';
         }
 
-        function clearData() {
+        async function clearData() {
             if(confirm('WARNING: Irreversible! Delete all data?')) {
-                localStorage.removeItem(KEYS.nl);
-                localStorage.removeItem(KEYS.ev);
-                localStorage.removeItem(KEYS.rs);
+                // Clear all data by checking if id is not null (deletes all records)
+                await Promise.all([
+                    _supabase.from('newsletters').delete().neq('id', null),
+                    _supabase.from('events').delete().neq('id', null),
+                    _supabase.from('resources').delete().neq('id', null)
+                ]);
+                await fetchAllData();
                 renderList('nl'); renderList('ev'); renderList('rs'); updateDashboard();
                 showToast('All data cleared.');
             }
